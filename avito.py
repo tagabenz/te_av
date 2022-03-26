@@ -46,7 +46,7 @@ class Avito(Browser):
     def __init__(self,config):
         self.bool=bool(True)
         self.items=array.array('l')
-        self.key=''
+        self.key='f=5.8696cbce96d2947c36b4dd61b04726f147e1eada7172e06c47e1eada7172e06c47e1eada7172e06c47e1eada7172e06cb59320d6eb6303c1b59320d6eb6303c1b59320d6eb6303c147e1eada7172e06c8a38e2cgit5b3e08b898a38e2c5b3e08b890df103df0c26013a0df103df0c26013a2ebf3cb6fd35a0ac7b0d53c7afc06d0b28a353c4323c7a3ab0c8390560c7eb9e433be0669ea77fc074c4a16376f87ccdbed76bde8afb15d2fb0fb526bb39450a46b8ae4e81acb9fae2415097439d4047d50b96489ab264edc772035eab81f5e1e992ad2cc54b8aa8d99271d186dc1cd03de19da9ed218fe23de19da9ed218fe23de19da9ed218fe2e992ad2cc54b8aa846b8ae4e81acb9fa24a135baa76198de200d6205cb221f078b946e01190bb5bdce96a5a7a0a9cc14c815decae37689f51ba6d8b24fb5a1f75db7d2021a95f33f910b42344ab0c3e9900fc7639e2d06f4c9235b9fb010db08e6f7d6454d36235791e52da22a560f550df103df0c26013a0df103df0c26013aaaa2b79c1ae925950616eed5c5b9b4a69e5cb44105151e423de19da9ed218fe207b7a18108a6dcd61c75b0584548fc4542fa6164d962e358d14f8beb6c69437b'
         self.search_words=config.tg_bot.search_words
         self.stop_words=config.tg_bot.stop_words
         self.s = requests.Session()
