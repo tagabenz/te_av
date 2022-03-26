@@ -5,44 +5,44 @@ import requests
 from aiogram import types
 from aiogram.utils.exceptions import MessageTextIsEmpty
 
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import WebDriverException, TimeoutException
+# from selenium import webdriver
+# from selenium.webdriver.chrome.options import Options
+# from selenium.webdriver.chrome.service import Service
+# from selenium.webdriver.support import expected_conditions as EC
+# from selenium.webdriver.support.ui import WebDriverWait
+# from selenium.webdriver.common.by import By
+# from selenium.common.exceptions import WebDriverException, TimeoutException
 
 
-class Browser():
-    def __init__(self):
-        pass
+# class Browser():
+#     def __init__(self):
+#         pass
+#
+#     def get_key(self):
+#         service = Service('/Users/tagabenz/Desktop/chromedriver')
+#         options = Options()
+#         options.add_argument("--disable-blink-features=AutomationControlled")
+#         options.add_argument("--headless")
+#         browser=webdriver.Chrome(options=options,service=service)
+#         browser.set_page_load_timeout(20)
+#         browser.delete_all_cookies()
+#         cookies=''
+#         try:
+#             browser.get('https://www.avito.ru/')
+#             time.sleep(3)
+#             browser.refresh()
+#             time.sleep(15)
+#             cookies=browser.get_cookies()
+#         except:
+#             browser.close()
+#             self.get_key()
+#         if cookies:
+#             for cookie in cookies:
+#                 if cookie['name'] == 'f':
+#                     return f"f={cookie['value']}"
 
-    def get_key(self):
-        service = Service('/Users/tagabenz/Desktop/chromedriver')
-        options = Options()
-        options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--headless")
-        browser=webdriver.Chrome(options=options,service=service)
-        browser.set_page_load_timeout(20)
-        browser.delete_all_cookies()
-        cookies=''
-        try:
-            browser.get('https://www.avito.ru/')
-            time.sleep(3)
-            browser.refresh()
-            time.sleep(15)
-            cookies=browser.get_cookies()
-        except:
-            browser.close()
-            self.get_key()
-        if cookies:
-            for cookie in cookies:
-                if cookie['name'] == 'f':
-                    return f"f={cookie['value']}"
 
-
-class Avito(Browser):
+class Avito():
     def __init__(self,config):
         self.bool=bool(True)
         self.items=array.array('l')
