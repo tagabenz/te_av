@@ -101,14 +101,14 @@ class Avito():
             self.bool = False
 
     async def get_content(self,id):
-        # headers={
-        #     'User-agent': "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1",
-        #     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-        #     'Accept-Encoding': 'gzip, deflate, br',
-        #     'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
-        #     'Cache-Control': 'max-age=0',
-        #     'Connection': 'keep-alive',
-        # }
+        headers={
+            'User-agent': "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1",
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Cache-Control': 'max-age=0',
+            'Connection': 'keep-alive',
+        }
         jsonObj2=requests.get('https://www.avito.ru/api/15/items/{}?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir'.format(str(id))).json()
         # print(jsonObj2)
         try:
