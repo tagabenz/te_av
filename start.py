@@ -21,18 +21,15 @@ async def set_commands(bot: Bot):
 
 
 async def cmd_key(message: types.Message, avito=avito):
-    avito.bool=False
     print('Получение ключа анти-бана\n')
     avito.key=avito.get_key()
-    avito.update_session()
     await message.answer('Ключ установлен 🔑 ')
 
 
 async def cmd_start(message: types.Message, avito=avito):
     avito.message=message
-    if avito.key:await avito.get_requests()
+    if avito.key: await avito.get_requests()
     else:await message.answer('Введите команду /key ')
-
 
 async def main(config):
     bot=Bot(token=config.tg_bot.token)
