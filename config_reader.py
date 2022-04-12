@@ -8,6 +8,7 @@ class TgBot:
     admin_id: int
     search_words: str
     stop_words: str
+    driver_path: str
 
 
 @dataclass
@@ -26,5 +27,6 @@ def load_config(path: str):
             admin_id=int(tg_bot['admin_id']),
             search_words=tg_bot["search_words"],
             stop_words=tg_bot["stop_words"],
+            driver_path=tg_bot["driver_path"]
         )
     )

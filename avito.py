@@ -14,70 +14,45 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import WebDriverException, TimeoutException
 
 
-class Browser():
-    def __init__(self):
-        pass
-
-    def get_key(self):
-        service = Service('/Users/tagabenz/Desktop/chromedriver')
-        options = Options()
-        options.add_argument("--disable-blink-features=AutomationControlled")
-        # options.add_argument("--headless")
-        browser=webdriver.Chrome(options=options,service=service)
-        browser.set_page_load_timeout(20)
-        browser.delete_all_cookies()
-        cookies=''
-        try:
-            browser.get('https://www.avito.ru/')
-            time.sleep(3)
-            browser.refresh()
-            time.sleep(15)
-            cookies=browser.get_cookies()
-        except:
-            browser.close()
-            self.get_key()
-        if cookies:
-            for cookie in cookies:
-                if cookie['name'] == 'f':
-                    return f"f={cookie['value']}"
-
-
-class Avito(Browser):
+class Avito():
     def __init__(self,config):
-        self.bool=bool(True)
         self.items=array.array('l')
-        # self.key='f=5.8696cbce96d2947c36b4dd61b04726f147e1eada7172e06c47e1eada7172e06c47e1eada7172e06c47e1eada7172e06cb59320d6eb6303c1b59320d6eb6303c1b59320d6eb6303c147e1eada7172e06c8a38e2c5b3e08b898a38e2c5b3e08b890df103df0c26013a0df103df0c26013a2ebf3cb6fd35a0ac0df103df0c26013a8b1472fe2f9ba6b9b0c8390560c7eb9e433be0669ea77fc059c9621b2c0fa58f915ac1de0d034112ad09145d3e31a56946b8ae4e81acb9fae2415097439d4047d50b96489ab264edc772035eab81f5e1e992ad2cc54b8aa8d99271d186dc1cd03de19da9ed218fe23de19da9ed218fe23de19da9ed218fe2e992ad2cc54b8aa846b8ae4e81acb9fa38e6a683f47425a8352c31daf983fa077a7b6c33f74d335cb88de1666d503ec673532884b057e40dcd0833ebb6c2bf428dfef26b16e3ec43fb9819605e6f72bc23d9f5f1350376437250e759d75134c84b0cba095980dc6be2415097439d404746b8ae4e81acb9fa786047a80c779d5146b8ae4e81acb9fafb96e6054687616a71e7cb57bbcb8e0f2da10fb74cac1eabd1d953d27484fd81172bb5ce624ca6cfec742586df589148'
-        self.key=''
         self.search_words=config.tg_bot.search_words
         self.stop_words=config.tg_bot.stop_words
+        self.driver_path=config.tg_bot.driver_path
 
-    async def get_requests(self):
-        headers={
-            'User-Agent':"Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1",
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
-            'Cache-Control': 'max-age=0',
-            'Connection': 'keep-alive',
-            }
-        headers['Cookie'] = self.key
-
+    async def start_browser(self):
+        service = Service(executable_path=self.driver_path)
+        options = Options()
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument("--headless")
+        self.browser=webdriver.Chrome(options=options,service=service)
+        print('Запуск браузера')
+        self.browser.set_page_load_timeout(20)
+        self.browser.delete_all_cookies()
         await self.message.answer("Парсинг запущен ✅")
-
-        with requests.Session() as s:
-            while self.bool == True:
+        try:
+            self.browser.get('https://www.avito.ru/')
+            # time.sleep(3)
+            self.browser.refresh()
+            while True:
                 t1=time.time()
                 try:
-                    self.jsonObj=s.get('https://www.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=97&params[137]=613&locationId=107620&localPriority=1&sort=date&isGeoProps=true&presentationType=serp&priceMin={}&limit=3'.format(str(random.randint(4000,4100))), headers=headers,timeout=1).json()
-                    # print(self.jsonObj)
-                    if self.jsonObj['code'] == 403:print("\nСмените ключ анти-бана!!!\n")
-                    else:pass
+                    self.browser.get('https://www.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=97&params[137]=613&locationId=107620&localPriority=1&sort=date&isGeoProps=true&presentationType=serp&priceMin={}&limit=3'.format(str(random.randint(4000,4100))))
+                    self.jsonObj=json.loads(self.browser.find_element_by_xpath('/html/body/pre').text)
                 except:
                     pass
                 asyncio.ensure_future(self.parse())
                 await asyncio.sleep(1)
                 t2=time.time()
                 print("{:.2f}".format(t2-t1))
+        except:
+            self.browser.close()
+            self.browser.quit()
+            await self.start_browser()
+        finally:
+            self.browser.close()
+            self.browser.quit()
 
     async def parse(self):
         try:
@@ -85,39 +60,32 @@ class Avito(Browser):
                        if re.findall(self.search_words,item['value']['uri_mweb'])
                        and not re.findall(self.stop_words,item['value']['uri_mweb'])
                        if item['value']['id'] not in self.items):
-                # print(id)
                 self.items.append(int(id))
-                try:
-                    await self.message.answer(await self.get_content(id))
-                except MessageTextIsEmpty:
-                    print(f"Поднятое объявление! {id}")
+                await self.get_content(id)
         except KeyError:
-            await self.message.answer(f"{self.jsonObj['error']['message']}")
-            self.bool = False
+            pass
 
     async def get_content(self,id):
-        headers={
-            'User-agent': "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1",
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
-            'Cache-Control': 'max-age=0',
-            'Connection': 'keep-alive',
-        }
-        jsonObj2=requests.get('https://www.avito.ru/api/15/items/{}?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir'.format(str(id))).json()
-        # print(jsonObj2)
+        self.browser.execute_script('''window.open();''')
+        self.browser.switch_to.window(self.browser.window_handles[1])
         try:
-            if jsonObj2['code'] == 403:print(jsonObj2['error']['message'])
-            else:pass
+            self.browser.get("https://www.avito.ru/api/15/items/{}?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir".format(str(id)))
+            jsonObj2=json.loads(self.browser.find_element_by_xpath('/html/body/pre').text)
+            self.browser.close()
         except:
+            pass
+        finally:
+            self.browser.switch_to.window(self.browser.window_handles[0])
+
+        if jsonObj2:
             if jsonObj2['stats']['views']['total'] == jsonObj2['stats']['views']['today']:
-                return (f"{jsonObj2['title']} \
+                await self.message.answer(f"{jsonObj2['title']} \
                         \n\n Цена 💵 : {jsonObj2['price']['value']}  Просмотров 👀 : {jsonObj2['stats']['views']['total']} \n \
                         \n 📌 Расположение: {jsonObj2['address']} \
                         \n {jsonObj2['sharing']['url']} \
                         \n\n Описание: \n {jsonObj2['description']}")
                         # \n\n{jsonObj2['images'][0]['240x180']}")
-            else:pass
+            else:print(f"Поднятое объявление: {jsonObj2['sharing']['url']}")
 
     async def get_phone(self,id):
         headers={
