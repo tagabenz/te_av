@@ -28,7 +28,7 @@ async def cmd_key(message: types.Message, avito=avito):
 
 async def cmd_start(message: types.Message, avito=avito):
     avito.message=message
-    if avito.key: await avito.get_requests()
+    if avito.key:await avito.get_requests()
     else:await message.answer('Введите команду /key ')
 
 async def main(config):

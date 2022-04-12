@@ -22,7 +22,7 @@ class Browser():
         service = Service('/Users/tagabenz/Desktop/chromedriver')
         options = Options()
         options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--headless")
+        # options.add_argument("--headless")
         browser=webdriver.Chrome(options=options,service=service)
         browser.set_page_load_timeout(20)
         browser.delete_all_cookies()
@@ -75,7 +75,7 @@ class Avito(Browser):
                 except:
                     pass
                 asyncio.ensure_future(self.parse())
-                await asyncio.sleep(.5)
+                await asyncio.sleep(1)
                 t2=time.time()
                 print("{:.2f}".format(t2-t1))
 
