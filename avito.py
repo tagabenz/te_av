@@ -21,11 +21,16 @@ class Avito():
         self.stop_words=config.tg_bot.stop_words
         self.driver_path=config.tg_bot.driver_path
 
+    async def close_browser(self):
+        self.browser.close()
+        self.browser.quit()
+        await self.start_browser()
+
     async def start_browser(self):
         service = Service(executable_path=self.driver_path)
         options = Options()
         options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--headless")
+        # options.add_argument("--headless")
         self.browser=webdriver.Chrome(options=options,service=service)
         print('Запуск браузера')
         self.browser.set_page_load_timeout(20)
@@ -33,26 +38,30 @@ class Avito():
         await self.message.answer("Парсинг запущен ✅")
         try:
             self.browser.get('https://www.avito.ru/')
-            # time.sleep(3)
+            time.sleep(3)
             self.browser.refresh()
             while True:
                 t1=time.time()
                 try:
-                    self.browser.get('https://www.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=97&params[137]=613&locationId=107620&localPriority=1&sort=date&isGeoProps=true&presentationType=serp&priceMin={}&limit=3'.format(str(random.randint(4000,4100))))
+                    self.browser.get('https://www.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=97&params[137]=613&locationId=621540&localPriority=1&sort=date&isGeoProps=true&presentationType=serp&priceMin={}&limit=3'.format(str(random.randint(4000,4100))))
                     self.jsonObj=json.loads(self.browser.find_element_by_xpath('/html/body/pre').text)
                 except:
-                    pass
-                asyncio.ensure_future(self.parse())
-                await asyncio.sleep(1)
-                t2=time.time()
-                print("{:.2f}".format(t2-t1))
+                    print("Exit from loop")
+                    await self.close_browser()
+                if 'code' in self.jsonObj and self.jsonObj['code'] == 403:
+                    print(self.jsonObj['error']['message'])
+                    break
+                else:
+                    asyncio.ensure_future(self.parse())
+                    await asyncio.sleep(1)
+                    t2=time.time()
+                    print("{:.2f}".format(t2-t1))
         except:
-            self.browser.close()
-            self.browser.quit()
-            await self.start_browser()
+            print('Exit from start_browser()')
+            await self.close_browser()
         finally:
-            self.browser.close()
-            self.browser.quit()
+            print("finally")
+            await self.close_browser()
 
     async def parse(self):
         try:
@@ -71,21 +80,20 @@ class Avito():
         try:
             self.browser.get("https://www.avito.ru/api/15/items/{}?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir".format(str(id)))
             jsonObj2=json.loads(self.browser.find_element_by_xpath('/html/body/pre').text)
-            self.browser.close()
+            if 'code' in jsonObj2 and jsonObj2['code'] == 403:self.browser.close()
+            elif jsonObj2['firebaseParams']['isShop'] == 1:self.browser.close()
+            else:
+                await self.message.answer(f"{jsonObj2['title']} \
+                    \n\n Цена 💵 : {jsonObj2['price']['value']} \n \
+                    \n 📌 Расположение: {jsonObj2['address']} \
+                    \n {jsonObj2['sharing']['url']} \
+                    \n\n Описание: \n {jsonObj2['description']}")
+                    # \n\n{jsonObj2['images'][0]['240x180']}")
+                self.browser.close()
         except:
-            pass
+            self.browser.close()
         finally:
             self.browser.switch_to.window(self.browser.window_handles[0])
-
-        if jsonObj2:
-            if jsonObj2['stats']['views']['total'] == jsonObj2['stats']['views']['today']:
-                await self.message.answer(f"{jsonObj2['title']} \
-                        \n\n Цена 💵 : {jsonObj2['price']['value']}  Просмотров 👀 : {jsonObj2['stats']['views']['total']} \n \
-                        \n 📌 Расположение: {jsonObj2['address']} \
-                        \n {jsonObj2['sharing']['url']} \
-                        \n\n Описание: \n {jsonObj2['description']}")
-                        # \n\n{jsonObj2['images'][0]['240x180']}")
-            else:print(f"Поднятое объявление: {jsonObj2['sharing']['url']}")
 
     async def get_phone(self,id):
         headers={
