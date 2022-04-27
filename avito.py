@@ -43,7 +43,7 @@ class Avito():
             while True:
                 t1=time.time()
                 try:
-                    self.browser.get('https://www.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=97&params[137]=613&locationId=107620&localPriority=1&sort=date&isGeoProps=true&presentationType=serp&priceMin={}&limit=5'.format(str(random.randint(4000,4100))))
+                    self.browser.get('https://www.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=97&params[137]=613&locationId=621540&localPriority=1&sort=date&isGeoProps=true&presentationType=serp&priceMin={}&limit=5'.format(str(random.randint(4000,4100))))
                     self.jsonObj=json.loads(self.browser.find_element_by_xpath('/html/body/pre').text)
                 except:
                     print("Exit from loop")
@@ -81,7 +81,7 @@ class Avito():
             self.browser.get("https://www.avito.ru/api/15/items/{}?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir".format(str(id)))
             jsonObj2=json.loads(self.browser.find_element_by_xpath('/html/body/pre').text)
             if 'code' in jsonObj2 and jsonObj2['code'] == 403:self.browser.close()
-            elif jsonObj2['firebaseParams']['isShop'] == 1 or 'total' in jsonObj2['stats']['views']:self.browser.close()
+            elif jsonObj2['firebaseParams']['isShop'] == '1' or 'total' in jsonObj2['stats']['views']:self.browser.close()
             else:
                 await self.message.answer(f"{jsonObj2['title']} \
                     \n 💵 Цена: {jsonObj2['price']['value']} \
